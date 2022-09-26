@@ -139,11 +139,22 @@ fn testing(url: &str) -> Result<AreaResult, Box<dyn Error>> {
     };
     let status = resp.status();
     if status.is_success() {
-        let json_resp = resp.json::<BiliResp>();
+        let resp_text = resp.text();
+        let resp_text = match resp_text {
+            Ok(resp_text) => resp_text,
+            Err(err) => {
+                return Err(err.into());
+            }
+        };
+        let json_resp = serde_json::from_str::<BiliResp>(&resp_text);
         let code = match json_resp {
             Ok(resp) => resp.code,
             Err(err) => {
-                return Err(err.into());
+                if resp_text.contains("\"code\":0,") {
+                    0
+                } else {
+                    return Err(err.into());
+                }
             }
         };
         if code == 0 {

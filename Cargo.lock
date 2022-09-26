@@ -56,6 +56,7 @@ dependencies = [
  "md5",
  "reqwest",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
